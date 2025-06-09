@@ -61,6 +61,8 @@ using SpecialFunctions: SpecialFunctions, gamma
 using StaticArrays: StaticArrays, SA, SMatrix, SVector, SArray, setindex
 using TupleTools: TupleTools
 
+import ElemCo.FciDumps: FDump, QFDump, read_fcidump, headvar
+
 using ..BitStringAddresses
 using ..Interfaces
 using ..Interfaces: sum_mutating!
