@@ -10,6 +10,8 @@ using Rimu.Hamiltonians: TransformUndoer, AbstractOffdiagonals
 using Rimu.InterfaceTests: test_observable_interface, test_operator_interface,
     test_hamiltonian_interface, test_hamiltonian_structure
 
+using ElemCo
+
 function exact_energy(ham)
     dv = DVec(starting_address(ham) => 1.0)
     all_results = eigsolve(ham, dv, 1, :SR; issymmetric = LOStructure(ham) == IsHermitian())
@@ -1722,4 +1724,13 @@ end
         # Check that the result of show can be pasted into the REPL
         @test eval(Meta.parse(repr(r))) == r
     end
+end
+
+@testset "MolecularHamitonian" begin
+    fcidump = string(@__DIR__, "/examples/h2o.FCIDUMP")
+    ref_hf_ground_energy = @bohf
+    h = MolecularHamiltonian(fcidump)
+    a = starting_address(h)
+    c = operator_column(h, a)
+    @test c.diag ≈ ref_hf_ground_energy
 end
