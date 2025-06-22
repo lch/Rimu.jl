@@ -1732,5 +1732,5 @@ end
     h = MolecularHamiltonian(fcidump)
     a = starting_address(h)
     c = operator_column(h, a)
-    @test c.diag ≈ ref_hf_ground_energy
+    @test diagonal_element(c) ≈ ref_hf_ground_energy
 end
