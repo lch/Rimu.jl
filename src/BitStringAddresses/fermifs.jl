@@ -131,6 +131,22 @@ Base.:(==)(a::FermiFS, b::FermiFS) = a.bs == b.bs
 num_occupied_modes(::FermiFS{N}) where {N} = N
 occupied_modes(a::FermiFS{N,<:Any,S}) where {N,S} = FermiOccupiedModes{N,S}(a.bs)
 
+num_unoccupied_modes(::FermiFS{N,M}) where {N,M} = M - N
+unoccupied_modes(a::FermiFS{N,<:Any,S}) where {N,S} = FermiUnoccupiedModes{N,S}(~a.bs)
+
+function UnoccupiedModeMap(addr::FermiFS{N,M}) where {N,M}
+    modes = unoccupied_modes(addr)
+    T = eltype(modes)
+    L = num_unoccupied_modes(addr)
+    indices = MVector{L,T}(undef)
+    i = 0
+    for index in modes
+        i += 1
+        indices[i] = index
+    end
+    return OccupiedModeMap(SVector(indices), i)
+end
+
 function near_uniform(::Type{FermiFS{N,M}}) where {N,M}
     return FermiFS([fill(1, N); fill(0, M - N)])
 end

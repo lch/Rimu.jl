@@ -651,6 +651,12 @@ end
 Base.length(::FermiOccupiedModes{N}) where {N} = N
 Base.eltype(::FermiOccupiedModes) = FermiFSIndex
 
+struct FermiUnoccupiedModes{N,S} <: OccupiedModeIterator
+    storage::S
+end
+Base.length(::FermiUnoccupiedModes{N}) where {N} = N
+Base.eltype(::FermiUnoccupiedModes) = FermiFSIndex
+
 """
     from_fermi_onr(::Type{B}, onr) -> B
 

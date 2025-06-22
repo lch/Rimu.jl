@@ -829,6 +829,44 @@ function Base.iterate(o::FermiOccupiedModes{<:Any,<:BitString{<:Any,1,T}}, st) w
     return FermiFSIndex(1, index, index - 1), (chunk >> (zeros % T), index + zeros)
 end
 
+function Base.iterate(o::FermiUnoccupiedModes{<:Any,<:BitString})
+    c = 0
+    chunk = o.storage.chunks[end]
+    while iszero(chunk)
+        c += 1
+        chunk = o.storage.chunks[end-c]
+    end
+    zeros = trailing_zeros(chunk % Int)
+    return iterate(o, (chunk >> (zeros % UInt64), c * 64 + zeros, c))
+end
+function Base.iterate(o::FermiUnoccupiedModes{<:Any,<:BitString}, st)
+    chunk, index, c = st
+    while iszero(chunk)
+        c += 1
+        c == num_chunks(o.storage) && return nothing
+        chunk = o.storage.chunks[end-c]
+        index = c * 64
+    end
+    zeros = trailing_zeros(chunk % Int)
+    index += zeros
+    chunk >>= zeros
+    return FermiFSIndex(0, index + 1, index), (chunk >> 1, index + 1, c)
+end
+
+function Base.iterate(o::FermiUnoccupiedModes{<:Any,<:BitString{<:Any,1,T}}) where {T}
+    chunk = o.storage.chunks[end]
+    zeros = trailing_zeros(chunk % Int)
+    return iterate(o, (chunk >> (zeros % T), zeros))
+end
+function Base.iterate(o::FermiUnoccupiedModes{<:Any,<:BitString{<:Any,1,T}}, st) where {T}
+    chunk, index = st
+    iszero(chunk) && return nothing
+    chunk >>= 0x1
+    index += 1
+    zeros = trailing_zeros(chunk % Int)
+    return FermiFSIndex(0, index, index - 1), (chunk >> (zeros % T), index + zeros)
+end
+
 # Default implementation uses iterating over occupied modes.
 function LinearAlgebra.dot(
     occ_a::FermiOccupiedModes{<:Any,S}, occ_b::FermiOccupiedModes{<:Any,S}
