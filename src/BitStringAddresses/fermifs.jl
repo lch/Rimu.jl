@@ -134,7 +134,7 @@ occupied_modes(a::FermiFS{N,<:Any,S}) where {N,S} = FermiOccupiedModes{N,S}(a.bs
 num_unoccupied_modes(::FermiFS{N,M}) where {N,M} = M - N
 unoccupied_modes(a::FermiFS{N,<:Any,S}) where {N,S} = FermiUnoccupiedModes{N,S}(~a.bs)
 
-function UnoccupiedModeMap(addr::FermiFS{N,M}) where {N,M}
+function unoccupied_mode_map(addr::FermiFS{N,M}) where {N,M}
     modes = unoccupied_modes(addr)
     T = eltype(modes)
     L = num_unoccupied_modes(addr)
@@ -142,7 +142,7 @@ function UnoccupiedModeMap(addr::FermiFS{N,M}) where {N,M}
     i = 0
     for index in modes
         i += 1
-        indices[i] = index
+        @inbounds indices[i] = index
     end
     return OccupiedModeMap(SVector(indices), i)
 end
